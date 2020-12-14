@@ -1,0 +1,567 @@
+---
+title: "Indicadores de violencia"
+output: 
+  flexdashboard::flex_dashboard:
+    storyboard: true
+    orientation: columns
+    vertical_layout: fill
+    theme: spacelab
+    log: mujer2.jpg
+---
+
+```{r setup, include=FALSE}
+library(flexdashboard)
+```
+
+```{r}
+library(dplyr)
+library(ggplot2)
+library(knitr)
+setwd("C:\\Users\\JULIA\\Documents\\PAMELA\\R Segundo semestre\\PROYECTO\\PROYECTO EST 383")
+load("BD_Mujeres.RData")
+```
+
+```{r}
+# Indicador 1
+c1<-casada %>% group_by(depto,area) %>% summarise(violencia_psicologica=(mean(v_psi))*100,
+                                                  violencia_fisica=(mean(v_fis))*100,
+                                                  violencia_sexual=(mean(v_sex))*100,
+                                                  violencia_economica=(mean(v_econ))*100)
+# Indicador 2
+c2<-casada %>% group_by(gedad) %>% summarise(violencia_psicologica=(mean(v_psi))*100,
+                                                  violencia_fisica=(mean(v_fis))*100,
+                                                  violencia_sexual=(mean(v_sex))*100,
+                                                  violencia_economica=(mean(v_econ))*100)
+# Indicador 3
+c3<-casada %>% group_by(area,Nivel_instruccion) %>% summarise(porcentaje=n())
+c3<-c3[!is.na(c3$Nivel_instruccion),]
+c3[,3]<-((c3[,3]/apply(c3[,3],2,sum))*100)
+# Indicador 4
+c4<-separada %>% group_by(depto,area) %>% summarise(violencia_psicologica=(mean(v_psi))*100,
+                                                  violencia_fisica=(mean(v_fis))*100,
+                                                  violencia_sexual=(mean(v_sex))*100,
+                                                  violencia_economica=(mean(v_econ))*100)
+# Indicador 5
+c5<-separada %>% group_by(gedad) %>% summarise(violencia_psicologica=(mean(v_psi))*100,
+                                                  violencia_fisica=(mean(v_fis))*100,
+                                                  violencia_sexual=(mean(v_sex))*100,
+                                                  violencia_economica=(mean(v_econ))*100)
+# Indicador 6
+c6<-separada %>% group_by(area,Nivel_instruccion) %>% summarise(porcentaje=n())
+c6[,3]<-((c6[,3]/apply(c6[,3],2,sum))*100)
+# Indicador 7
+c7<-soltera %>% group_by(depto,area) %>% summarise(violencia_psicologica=(mean(v_psi))*100,
+                                                  violencia_fisica=(mean(v_fis))*100,
+                                                  violencia_sexual=(mean(v_sex))*100,
+                                                  violencia_economica=(mean(v_econ))*100)
+# Indicador 8
+c8<-soltera %>% group_by(gedad) %>% summarise(violencia_psicologica=(mean(v_psi))*100,
+                                                  violencia_fisica=(mean(v_fis))*100,
+                                                  violencia_sexual=(mean(v_sex))*100,
+                                                  violencia_economica=(mean(v_econ))*100)
+# Indicador 9
+c9<-soltera %>% group_by(area,Nivel_instruccion) %>% summarise(porcentaje=n())
+c9[,3]<-((c9[,3]/apply(c9[,3],2,sum))*100)
+# Indicador 10
+bd<-rbind(casada,separada,soltera)
+cvp<-bd %>% filter(v_psi==TRUE) %>% group_by(depto,area) %>% summarise(promedio=mean(edad)) %>% mutate(violencia="psicológica")
+cvf<-bd %>% filter(v_fis==TRUE) %>% group_by(depto,area) %>% summarise(promedio=mean(edad)) %>% mutate(violencia="física")
+cvs<-bd %>% filter(v_sex==TRUE) %>% group_by(depto,area) %>% summarise(promedio=mean(edad)) %>% mutate(violencia="sexual")
+cve<-bd %>% filter(v_econ==TRUE) %>% group_by(depto,area) %>% summarise(promedio=mean(edad)) %>% mutate(violencia="económica")
+c10<-rbind(cvp,cvf,cvs,cve)
+
+c10r<-c10 %>% filter(area=="Rural")
+c10u<-c10 %>% filter(area=="urbano")
+```
+
+# Ind1
+
+Column{data-width=500}
+----------------------
+
+### Porcentaje de mujeres de 15 años o más casadas o en unión libre por departamento y área según tipo de violencia
+
+```{r}
+kable(c1,caption = "Tabla 1")
+```
+
+Column {.tabset}
+-----------------------
+ 
+### Violencia psicológica
+
+                                   Gráfico 1.1
+```{r}
+ggplot(c1,aes(x=area, y=violencia_psicologica)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~depto)+ggtitle("Violencia psicológica")+ylab("Porcentaje %")
+
+```
+Fuente: Elaboración propia
+
+
+### Violencia física
+                                  Gráfico 1.2
+```{r}
+ggplot(c1,aes(x=area, y=violencia_fisica)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~depto)+ggtitle("Violencia fisica")+ylab("Porcentaje %")
+
+```
+Fuente: Elaboración propia
+
+
+### Violencia sexual
+                                 Gráfico 1.3
+```{r}
+ggplot(c1,aes(x=area, y=violencia_sexual)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~depto)+ggtitle("Violencia sexual")+ylab("Porcentaje %")
+
+```
+Fuente: Elaboración propia
+
+### Violencia económica
+                                Gráfico 1.4
+```{r}
+ggplot(c1,aes(x=area, y=violencia_economica)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~depto)+ggtitle("Violencia económica")+ylab("Porcentaje %")
+
+```
+Fuente: Elaboración propia
+
+# Ind2
+Column{data-width=500}
+----------------------
+### Porcentaje de mujeres de 15 años o más casadas o en unión libre por grupos de edad según tipo de violencia
+```{r}
+kable(c2,caption = "Tabla 2")
+```
+
+
+Column {.tabset}
+-----------------------
+
+### Violencia psicológica
+                                Gráfico 2.1
+```{r}
+ggplot(c2,aes(x=gedad, y=violencia_psicologica)) +
+    geom_segment( aes(xend=gedad, yend=0)) +
+    geom_point( size=4, color="orange") +
+    theme_bw() +
+    xlab("Grupos de edad")+ylab("Porcentaje %")+ggtitle("Violencia psicológica")
+
+```
+Fuente: Elaboración propia
+
+### Violencia física
+                                Gráfico 2.2
+```{r}
+ggplot(c2,aes(x=gedad, y=violencia_fisica)) +
+    geom_segment( aes(xend=gedad, yend=0)) +
+    geom_point( size=4, color="orange") +
+    theme_bw() +
+    xlab("Grupos de edad")+ylab("Porcentaje %")+ggtitle("Violencia física")
+
+```
+Fuente: Elaboración propia
+
+### Violencia sexual
+                                Gráfico 2.3
+```{r}
+ggplot(c2,aes(x=gedad, y=violencia_sexual)) +
+    geom_segment( aes(xend=gedad, yend=0)) +
+    geom_point( size=4, color="orange") +
+    theme_bw() +
+    xlab("Grupos de edad")+ylab("Porcentaje %")+ggtitle("Violencia sexual")
+
+```
+Fuente: Elaboración propia
+
+### Violencia económica
+                                Gráfico 2.4
+```{r}
+ggplot(c2,aes(x=gedad, y=violencia_economica)) +
+    geom_segment( aes(xend=gedad, yend=0)) +
+    geom_point( size=4, color="orange") +
+    theme_bw() +
+    xlab("Grupos de edad")+ylab("Porcentaje %")+ggtitle("Violencia económica")
+
+```
+
+# Ind3
+Column{data-width=500}
+----------------------
+
+### Porcentaje de mujeres de 15 años o más casadas o en unión libre agredidas físicamente según el nivel de instrucción por área
+
+```{r}
+kable(c3,caption = "Tabla 3")
+```
+
+
+### Gráfico 3 
+                               
+```{r}
+ggplot(c3,aes(x=Nivel_instruccion, y=porcentaje)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~area)+ggtitle("Violencia física")+ylab("Porcentaje %")
+
+```
+Fuente: Elaboración propia
+
+# Ind4
+Column{data-width=500}
+----------------------
+
+### Porcentaje de mujeres de 15 años o más separadas, divorciadas o viudas por departamento y área según tipo de violencia
+
+```{r}
+kable(c4,caption = "Tabla 4")
+```
+
+
+Column {.tabset}
+-----------------------
+ 
+### Violencia psicológica
+
+                                Gráfico 4.1
+```{r}
+ggplot(c4,aes(x=area, y=violencia_psicologica)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~depto)+ggtitle("Violencia psicológica")+ylab("Porcentaje %")
+
+```
+Fuente: Elaboración propia
+
+### Violencia física
+ 
+                                Gráfico 4.2
+```{r}
+ggplot(c4,aes(x=area, y=violencia_fisica)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~depto)+ggtitle("Violencia fisica")+ylab("Porcentaje %")
+
+```
+Fuente: Elaboración propia
+
+### Violencia sexual
+
+                                Gráfico 4.3
+```{r}
+ggplot(c4,aes(x=area, y=violencia_sexual)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~depto)+ggtitle("Violencia sexual")+ylab("Porcentaje %")
+
+```
+Fuente: Elaboración propia
+
+### Violencia económica
+
+                                Gráfico 4.4
+```{r}
+ggplot(c4,aes(x=area, y=violencia_economica)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~depto)+ggtitle("Violencia económica")+ylab("Porcentaje %")
+
+```
+Fuente: Elaboración propia
+
+# Ind5
+Column{data-width=500}
+----------------------
+
+### Porcentaje de mujeres de 15 años o más separadas, divorciadas o viudas por grupos de edad según tipo de violencia
+
+```{r}
+kable(c5,caption = "Tabla 5")
+```
+
+
+Column {.tabset}
+-----------------------
+
+### Violencia psicológica
+
+                                Gráfico 5.1
+```{r}
+ggplot(c5,aes(x=gedad, y=violencia_psicologica)) +
+    geom_segment( aes(xend=gedad, yend=0)) +
+    geom_point( size=4, color="orange") +
+    theme_bw() +
+    xlab("Grupos de edad")+ylab("Porcentaje %")+ggtitle("Violencia psicológica")
+
+```
+Fuente: Elaboración propia
+
+### Violencia física
+
+                                Gráfico 5.2
+```{r}
+ggplot(c5,aes(x=gedad, y=violencia_fisica)) +
+    geom_segment( aes(xend=gedad, yend=0)) +
+    geom_point( size=4, color="orange") +
+    theme_bw() +
+    xlab("Grupos de edad")+ylab("Porcentaje %")+ggtitle("Violencia física")
+
+```
+
+### Violencia sexual
+
+                                Gráfico 5.3
+```{r}
+ggplot(c5,aes(x=gedad, y=violencia_sexual)) +
+    geom_segment( aes(xend=gedad, yend=0)) +
+    geom_point( size=4, color="orange") +
+    theme_bw() +
+    xlab("Grupos de edad")+ylab("Porcentaje %")+ggtitle("Violencia sexual")
+
+```
+Fuente: Elaboración propia
+
+### Violencia económica
+
+                               Gráfico 5.4
+```{r}
+ggplot(c5,aes(x=gedad, y=violencia_economica)) +
+    geom_segment( aes(xend=gedad, yend=0)) +
+    geom_point( size=4, color="orange") +
+    theme_bw() +
+    xlab("Grupos de edad")+ylab("Porcentaje %")+ggtitle("Violencia económica")
+
+```
+Fuente: Elaboración propia
+
+# Ind6
+Column{data-width=500}
+----------------------
+
+### Porcentaje de mujeres de 15 años o más separadas, divorciadas o viudas agredidas físicamente según el nivel de instrucción por área
+
+```{r}
+kable(c6,caption = "Tabla 6")
+```
+
+
+### Gráfico 6
+
+      
+```{r}
+ggplot(c6,aes(x=Nivel_instruccion, y=porcentaje)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~area)+ggtitle("Violencia física")+ylab("Porcentaje %")
+
+```
+Fuente: Elaboración propia
+
+# Ind7
+Column{data-width=500}
+----------------------
+
+### Porcentaje de mujeres de 15 años o más solteras por departamento y área según tipo de violencia
+
+```{r}
+kable(c7,caption = "Tabla 7")
+```
+
+Column {.tabset}
+-----------------------
+ 
+### Violencia psicológica
+
+                                Gráfico 7.1
+```{r}
+ggplot(c7,aes(x=area, y=violencia_psicologica)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~depto)+ggtitle("Violencia psicológica")+ylab("Porcentaje %")
+
+```
+Fuente: Elaboración propia
+
+### Violencia física
+
+                                Gráfico 7.2
+```{r}
+ggplot(c7,aes(x=area, y=violencia_fisica)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~depto)+ggtitle("Violencia fisica")+ylab("Porcentaje %")
+
+```
+Fuente: Elaboración propia
+
+### Violencia sexual
+
+                                Gráfico 7.3
+```{r}
+ggplot(c7,aes(x=area, y=violencia_sexual)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~depto)+ggtitle("Violencia sexual")+ylab("Porcentaje %")
+
+```
+Fuente: Elaboración propia
+
+### Violencia económica
+
+                              Gráfico 7.4
+```{r}
+ggplot(c7,aes(x=area, y=violencia_economica)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~depto)+ggtitle("Violencia económica")+ylab("Porcentaje %")
+
+```
+Fuente: Elaboración propia
+
+# Ind8
+Column{data-width=500}
+----------------------
+
+### Porcentaje de mujeres de 15 años o más solteras por grupos de edad según tipo de violencia
+
+```{r}
+kable(c8,caption = "Tabla 8")
+```
+
+Column {.tabset}
+-----------------------
+
+### Violencia psicológica
+
+                               Gráfico 8.1
+```{r}
+ggplot(c8,aes(x=gedad, y=violencia_psicologica)) +
+    geom_segment( aes(xend=gedad, yend=0)) +
+    geom_point( size=4, color="orange") +
+    theme_bw() +
+    xlab("Grupos de edad")+ylab("Porcentaje %")+ggtitle("Violencia psicológica")
+
+```
+Fuente: Elaboración propia
+
+### Violencia física
+
+                               Gráfico 8.2
+```{r}
+ggplot(c8,aes(x=gedad, y=violencia_fisica)) +
+    geom_segment( aes(xend=gedad, yend=0)) +
+    geom_point( size=4, color="orange") +
+    theme_bw() +
+    xlab("Grupos de edad")+ylab("Porcentaje %")+ggtitle("Violencia física")
+
+```
+Fuente: Elaboración propia
+
+### Violencia sexual
+
+                               Gráfico 8.3
+```{r}
+ggplot(c8,aes(x=gedad, y=violencia_sexual)) +
+    geom_segment( aes(xend=gedad, yend=0)) +
+    geom_point( size=4, color="orange") +
+    theme_bw() +
+    xlab("Grupos de edad")+ylab("Porcentaje %")+ggtitle("Violencia sexual")
+
+```
+Fuente: Elaboración propia
+
+### Violencia económica
+
+                               Gráfico 8.4
+```{r}
+ggplot(c8,aes(x=gedad, y=violencia_economica)) +
+    geom_segment( aes(xend=gedad, yend=0)) +
+    geom_point( size=4, color="orange") +
+    theme_bw() +
+    xlab("Grupos de edad")+ylab("Porcentaje %")+ggtitle("Violencia económica")
+
+```
+Fuente: Elaboración propia
+
+# Ind9
+Column{data-width=500}
+----------------------
+
+### Porcentaje de mujeres de 15 años o más solteras agredidas físicamente según el nivel de instrucción por área
+
+```{r}
+kable(c9,caption = "Tabla 9")
+```
+
+### Gráfico 9
+```{r}
+ggplot(c9,aes(x=Nivel_instruccion, y=porcentaje)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~area)+ggtitle("Violencia física")+ylab("Porcentaje %")
+
+```
+Fuente: Elaboración propia
+
+# Ind10
+Column{data-width=500}
+----------------------
+
+### Promedio de edad de mujeres mayores a 15 años de edad según el tipo de violencia por departamento y área
+
+```{r}
+kable(c10,caption = "Tabla 10")
+```
+
+
+Column {.tabset}
+-----------------------
+### Área rural
+
+                                Gráfico 10.1
+```{r}
+ggplot(c10r,aes(x=depto, y=promedio)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~violencia)+ggtitle("Área rural")+ylab("Promedio de edades")
+```
+Fuente: Elaboración propia
+
+### Área urbana
+
+                                Gráfico 10.2
+```{r}
+ggplot(c10u,aes(x=depto, y=promedio)) +
+    geom_bar(stat="identity", fill="#f68060", alpha=.6, width=.4) +
+    coord_flip() +
+    xlab("") +
+    theme_bw()+facet_wrap(~violencia)+ggtitle("Área urbano")+ylab("Promedio de edades")
+
+```
+Fuente: Elaboración propia
+
